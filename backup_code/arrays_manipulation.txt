@@ -1,0 +1,175 @@
+#Server.js
+
+const express = require('express');
+const cors = require('cors');
+const app = express();
+require('dotenv').config();
+const PORT = process.env.PORT || 5000;
+app.use(cors());
+app.use(express.json());
+const pokedexVar = [];
+let nextPokeId = 1;
+
+app.get('/pokemon', (req, res) => {
+    res.json(pokedexVar);
+});
+
+app.post('/pokemon', (req, res) => {
+    console.log(req.body);
+    const { pName, pType } = req.body;
+    if (!pName?.trim() || !pType?.trim()) {
+        return res.status(400).json({ message: "Cannot fill Pokedex, if you don't catch anything" });
+    }
+    const newPokemon = {
+        id: nextPokeId,
+        ...req.body
+    }
+    
+    pokedexVar.push(newPokemon);
+    nextPokeId++;
+    res.status(201).json({ message: "New Pokemon added to the Pokedex", newPokemon: newPokemon });
+});
+
+app.put('/pokemon/:id', (req, res) => {
+    const pokemonEvolution = pokedexVar.find(pokemon => pokemon.id === Number(req.params.id));
+    if (!pokemonEvolution) {
+        return res.status(404).json({ message: "Couldn't find the specific Pokemon" });
+    }
+    const { pName, pType } = req.body;
+    if (!pName?.trim() || !pType?.trim()) {
+        return res.status(400).json({ message: "Can't catch a pokemon if it doesn't exist!! In backend too" });
+    }
+    Object.assign(
+        pokemonEvolution,
+        { pName, pType }
+    );
+    res.json({ message: "Pokemon Updated", evolvedPokemon: pokemonEvolution});
+});
+
+app.delete('/pokemon/:id', (req, res) => {
+    const pokemonReleaseId = pokedexVar.findIndex(pokemon => pokemon.id === Number(req.params.id));
+    if (pokemonReleaseId === -1) {
+        return res.status(404).json({ message: "Impossible to release the pokemon, that can't be found" });
+    }
+    pokedexVar.splice(pokemonReleaseId, 1);
+    res.json({ message: "Pokemon Released" });
+});
+
+app.listen(PORT, () => console.log(`Server is listening to the PORT: ${PORT}`));
+
+# App.js
+const year = new Date().getFullYear();
+document.querySelector('.year').innerHTML = year;
+const serverLocation = "http://localhost:5000/pokemon/";
+const pokemonContent = document.querySelector('.pokemon-content');
+const addPokemonBtn = document.querySelector('.add-pokemon-btn');
+let editingMode = false;
+let editingPokeId = null;
+
+async function getPokemon() {
+    const response = await fetch(`${serverLocation}`);
+    const pokeList = await response.json();
+    pokemonContent.innerHTML = "";
+    console.log(pokeList);
+    if (pokeList.length > 0) {
+        pokeList.forEach(pokemon => {
+            pokemonContent.innerHTML += `
+                <div class="col-12 mb-3 mb-sm-0">
+                    <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">${pokemon.pName}</h5>
+                        <p class="card-text">${pokemon.pType}</p>
+                        <button href="#" data-id="${pokemon.id}" data-pName="${pokemon.pName}" data-pType="${pokemon.pType}" class="btn btn-success edit-poke-btn">Evolve Pokemon</button>
+                        <button href="#" data-id="${pokemon.id}" class="btn btn-danger delete-poke-btn">Release Pokemon</button>
+                    </div>
+                    </div>
+                </div>
+            `
+        });
+    }
+}
+
+addPokemonBtn.addEventListener('click', async () => {
+    const pName = document.querySelector('#pName').value.trim();
+    const pType = document.querySelector('#pType').value.trim();
+    if (!pName || !pType) {
+        alert("Pokeball can't store empty Pokemon, gotta catch'em first!");
+        return;
+    }
+    if (editingMode) {
+        try {
+            const updatePokemonResponse = await fetch(`${serverLocation}${editingPokeId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify({
+                    "pName": pName,
+                    "pType": pType
+                })
+            });
+            if (!updatePokemonResponse.ok) {
+                alert('Something went wrong');
+                const errorData = await updatePokemonResponse.json();
+                console.log(errorData);
+                return;
+            }
+            editingMode = false;
+            editingPokeId = null;
+            addPokemonBtn.textContent = "Gotta Catch'em All";
+            document.querySelector('#pName').value = "";
+            document.querySelector('#pType').value = "";
+        } catch (error) {
+            alert('Pokedex not updated');
+            console.log(error);
+        }
+    } else {
+        try {
+            console.log('Adding Mode');
+            const addPokemonResponse = await fetch(`${serverLocation}`,{
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "pName": pName,
+                    "pType": pType
+                })
+            });
+            if (!addPokemonResponse.ok) {
+                alert("Coudn't catch the Pokemon");
+                const errorData = await addPokemonResponse.json();
+                console.log(errorData);
+                return;
+            }
+        } catch (err) {
+            alert("Something Went Wrong, couldn't catch the pokemon");
+            console.log(err);
+        }
+    }
+    await getPokemon();
+});
+
+pokemonContent.addEventListener('click', async (event) => {
+    if (event.target.classList.contains('edit-poke-btn')) {
+        document.querySelector('#pName').value = event.target.dataset.pname;
+        document.querySelector('#pType').value = event.target.dataset.ptype;
+        editingMode = true;
+        editingPokeId = Number(event.target.dataset.id);
+        addPokemonBtn.textContent = "Pokemon Evolve"
+    }
+    if (event.target.classList.contains('delete-poke-btn')) {
+        const releasePokemonResponse = await fetch(`${serverLocation}${Number(event.target.dataset.id)}`, {
+            method: "DELETE"
+        });
+        if (!releasePokemonResponse.ok) {
+            alert('Something went wrong');
+            const errorData = await releasePokemonResponse.json();
+            console.log(errorData);
+            return;
+        }
+        console.log('Released Pokemon');
+        await getPokemon();
+    }
+})
+getPokemon();
