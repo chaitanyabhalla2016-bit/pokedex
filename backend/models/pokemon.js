@@ -9,9 +9,21 @@ const pokemonSchema = mongoose.Schema({
         type: String,
         required: true,
         trim: true
+    },
+    pImage: {
+        type: String,
+        required: false
+    },
+    pSpecies: {
+        type: String,
+        required: false
+    },
+    pColor: {
+        type: String,
+        required: false
     }
 }, {
-    timeStamps: {
+    timestamps: {
         createdAt: 'created_at',
         updatedAt: 'updated_at'
     }

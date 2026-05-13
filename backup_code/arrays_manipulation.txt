@@ -173,3 +173,5 @@ pokemonContent.addEventListener('click', async (event) => {
     }
 })
 getPokemon();
+
+https://m.media-amazon.com/images/I/51TIbI-assL._SY450_.jpg

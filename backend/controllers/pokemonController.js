@@ -3,7 +3,7 @@ const Pokemon = require('../models/pokemon');
 // Get Pokemon
 const chooseEmAll = async (req, res) => {
     try {
-        const allPokemon = await Pokemon.find();
+        const allPokemon = await Pokemon.find().sort({ createdAt: -1 });
         console.log(allPokemon);
         res.status(200).json(allPokemon);
     } catch (error) {
@@ -14,13 +14,20 @@ const chooseEmAll = async (req, res) => {
 // Catch Pokemon
 const catchPokemon = async (req, res) => {
     try {
-        const { pName, pType } = req.body;
-        if (!pName?.trim() || !pType?.trim()) {
+        const { pName,
+            pType,
+            pImage,
+            pSpecies,
+            pColor } = req.body;
+        if (!pName?.trim() || !pType?.trim() || !pImage?.trim() || !pSpecies?.trim() || !pColor?.trim()) {
             return res.status(400).json({ errorMessage: "Nice try, but can't catch an empty Pokemon😂" });
         }
         const newPokemon = await Pokemon.create({
             pName,
-            pType
+            pType,
+            pImage,
+            pSpecies,
+            pColor
         });
         if (newPokemon) {
             res.status(201).json({ successMessage: "We caught the new Pokemon.", pokemonCaught: newPokemon });
@@ -37,16 +44,20 @@ const evolvePokemon = async (req, res) => {
         if (!req.params.id?.trim()) {
             return res.status(400).json({ errorMessage: "Can't evolve a pokemon, if it's id not specified" });
         }
-        const { pName, pType } = req.body;
-        if (!pName?.trim() || !pType?.trim()) {
+        const { pName,
+            pType,
+            pImage,
+            pSpecies,
+            pColor } = req.body;
+        if (!pName?.trim() || !pType?.trim() || !pImage?.trim() || !pSpecies?.trim() || !pColor?.trim()) {
             return res.status(400).json({ errorMessage: "Cant't replace existing pokemon with a blank" });
         }
         const evolutionProcess = await
-            Pokemon.findByIdAndUpdate(req.params.id,{pName,pType},{returnDocument:"after"});
+            Pokemon.findByIdAndUpdate(req.params.id,{pName,pType,pImage,pSpecies,pColor},{returnDocument:"after"});
         if (!evolutionProcess) {
             return res.status(404).json({ errorMessage: "Can't evolve a pokemon, if it wan't caught!!" });
         }
-        res.status(201).json({successMessage:"Pokemon Evolved successfully."})
+        res.status(200).json({successMessage:"Pokemon Evolved successfully."})
     } catch (error) {
         console.log(error);
         res.status(500).json({ errorMessage: "Something went wrong.Pokemon couldn't evolve" });       
