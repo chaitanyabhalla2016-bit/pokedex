@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function getPokemon() {
         try {
             const defaultHoverColor = 'var(--bg-pikachu-subtle)';
-            const chooseEmAllResponse = await fetch(`${config.apiUrl}${config.appName}`);
+            const chooseEmAllResponse = await fetch(`${BASE_URL}/pokemon`);
             if (!chooseEmAllResponse.ok) {
                 alert('No Response from Backend.');
                 const errorData = await chooseEmAllResponse.json();
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert("Can't evolve a Pokemon if not exist!!");
                     return;
                 }
-                const evolvePokemonResponse = await fetch(`${config.apiUrl}${config.appName}/${editingId}`, {
+                const evolvePokemonResponse = await fetch(`${BASE_URL}/pokemon/${editingId}`, {
                     method: "PUT",
                     headers: {
                         "Content-Type":"application/json"
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert("Can't store an empty pokemon in PokeDex. Catch'em first!");
                     return;
                 }
-                const catchPokemonResponse = await fetch(`${config.apiUrl}${config.appName}`, {
+                const catchPokemonResponse = await fetch(`${BASE_URL}/pokemon`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 editingId = event.target.dataset.id;
             }
             if (event.target.classList.contains('delete-poke-btn')) {
-                const releasePokemonResponse = await fetch(`${config.apiUrl}${config.appName}/${event.target.dataset.id}`, {
+                const releasePokemonResponse = await fetch(`${BASE_URL}/pokemon/${event.target.dataset.id}`, {
                     method:"DELETE"
                 });
                 if (!releasePokemonResponse.ok) {

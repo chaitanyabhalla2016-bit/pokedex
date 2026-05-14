@@ -1,6 +1,5 @@
-const config = {
-    apiUrl: "http://localhost:5000/",
-    appName: "pokemon"
+const CONFIG = {
+    BASE_URL: "https://pokedex-hra9.onrender.com"
 };
 
-export default config;
+export default CONFIG;
