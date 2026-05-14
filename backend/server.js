@@ -1,24 +1,25 @@
 require('dotenv').config();
-const MONGO_URI = process.env.POKELOCATION;
+const MONGO_URI = process.env.MONGO_URI;
 const ALTERNATE_MONGO_URI = process.env.POKECOMPASSLOCATION
-const PORT = process.env.POKEPORT;
+const PORT = process.env.PORT || 5000;
 const express = require('express');
 const mongoose = require('mongoose');
 const pokemonRoutes = require('./routes/pokemonRoutes');
 const cors = require('cors');
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: [
+        "http://localhost:5000",
+        "127.0.0.1:5500",
+        "https://cbhallamudi.com"
+    ]
+}));
 app.use(express.json());
 
 mongoose.connect(MONGO_URI).then(() => {
     console.log("MongoDB connected");
 }).catch((error) => {
-    mongoose.connect(ALTERNATE_MONGO_URI).then(() => {
-        console.log("MongoDB connected");
-    }).catch((error) => {
-        console.log("Compass also failed.",error);
-    });
     console.log(error);
 });
 
