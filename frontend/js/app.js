@@ -1,4 +1,4 @@
-import config from './config.js';
+import CONFIG from './config.js';
 document.addEventListener('DOMContentLoaded', () => {
     const pokemonContent = document.querySelector('.pokemon-content');
     const addPokeBtn = document.querySelector('.add-poke-btn');
@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const pColorVar = document.getElementById('pColor');
     let editingMode = false;
     let editingId = null;
+    const BASE_URL = CONFIG.BASE_URL;
 
     // const pokeCard = document.querySelectorAll('.poke-card');
     // pokeCard.forEach(pCard => {
