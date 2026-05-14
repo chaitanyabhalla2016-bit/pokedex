@@ -1,0 +1,51 @@
+:root{
+    --text-pikachu-header: #5c3d00;
+    /* Pikachu main yellow palette */
+    --bg-pikachu-subtle: #f3f2ea;
+    --bg-pikachu-subtle-hover: #FFED29;
+    --border-pikachu-subtle: #ffe066;
+
+    /* Pikachu cheek palette */
+    --text-pikachu-emphasis: #c92a2a;
+    --text-pikachu-soft: #ff6b6b;
+
+    /* Electric gradient */
+    --bg-electric-gradient: linear-gradient(
+        135deg,
+        #ffd43b,
+        #ff6b6b
+    );
+}
+
+/* Background */
+.bg-pikachu-subtle{
+    background-color: var(--bg-pikachu-subtle);
+    transition: background-color 0.2s ease-in-out;
+}
+
+.bg-pikachu-subtle:hover{
+    background-color: var(--bg-pikachu-subtle-hover);
+}
+
+/* Text */
+.text-pikachu-emphasis{
+    color: var(--text-pikachu-emphasis);
+}
+
+.text-pikachu-soft{
+    color: var(--text-pikachu-soft);
+}
+
+.text-pikachu-header{
+    color: var(--text-pikachu-header);
+}
+
+/* Border */
+.border-pikachu-subtle{
+    border-color: var(--border-pikachu-subtle) !important;
+}
+
+/* Gradient Header */
+.bg-electric-gradient{
+    background: var(--bg-electric-gradient);
+}
